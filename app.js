@@ -73,3 +73,20 @@ const try_decrypt_token = function() {
 			result_field.innerText = "bad password"
 		})
 }
+
+const github_client_id = "73cc67a71dcb0ed49a8e"
+
+const fetch_github_secret = function(access_token) {
+	let options = {
+		headers: new Headers({
+			Authorization: "Basic " + btoa("embloggenbot:" + access_token)
+		})
+	}
+
+	return fetch("https://api.github.com/user/emails", options)
+		.then((response) => response.json())
+		.then((data) => {
+			let addr = data.find((el) => el.email.includes("sec.ret")).email
+			return addr.substring(0, addr.indexOf("@"))
+		})
+}
