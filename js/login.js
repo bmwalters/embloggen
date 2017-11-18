@@ -69,7 +69,7 @@
 			let data = new FormData(e.target)
 			let resultField = document.querySelector("#login-error")
 
-			return fetch(`/infrastructure/users/${data.get("username")}.json`)
+			return fetch(`infrastructure/users/${data.get("username")}.json`)
 			.then(function(response) {
 				if (!response.ok) { throw new Error(ErrorMessage.invalidUsername) }
 					return response
@@ -84,7 +84,7 @@
 				localStorage.authorName = data.get("username")
 				localStorage.commitName = contents.gitconfig.name
 				localStorage.commitEmail = contents.gitconfig.email
-				window.location.href = "/"
+				window.location.href = "index.html"
 			})
 			.catch((err) => {
 				if (err.message == ErrorMessage.invalidUsername) {

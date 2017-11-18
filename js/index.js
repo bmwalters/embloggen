@@ -7,7 +7,7 @@
 			document.documentElement.classList.add("logged-in")
 		}
 
-		return fetch("/infrastructure/posts.json")
+		return fetch("infrastructure/posts.json")
 		.then((response) => response.json())
 		.then((posts) => {
 			posts

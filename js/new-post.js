@@ -72,7 +72,7 @@
 
 			createPost(data.get("title"), data.get("synopsis"), data.get("content"))
 			.then(() => {
-				window.location.href = "/"
+				window.location.href = "index.html"
 			})
 			.catch((err) => {
 				console.log("error", err) // TODO: display error to user
