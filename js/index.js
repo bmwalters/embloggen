@@ -15,6 +15,7 @@
 			.map((post) => {
 				let postElement = document.querySelector("#post-template").content
 
+				postElement.querySelector(".post").href = `post.html?id=${post.id}`
 				postElement.querySelector(".post-title").innerText = post.title
 				postElement.querySelector(".post-synopsis").innerText = post.synopsis
 				postElement.querySelector(".post-author").innerText = post.author

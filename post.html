@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>Embloggen</title>
+	<script async src="js/view-post.js"></script>
+	<link rel="stylesheet" href="css/style.css">
+	<style>
+		main header h2 {
+			font-size: 18px;
+			opacity: 0.8;
+		}
+
+		main article {
+			padding: 16px 64px 16px 64px;
+		}
+	</style>
+</head>
+
+<body>
+	<main>
+		<header>
+			<h1 id="post-title"></h1>
+			<h2>Posted by <span id="post-author"></span> on <span id="post-date"></span></h2>
+		</header>
+		<hr>
+		<article id="post-content"></article>
+		<hr>
+		<footer>
+			<a href="index.html" id="about-link">Home</a>
+		</footer>
+	</main>
+</body>
+</html>
