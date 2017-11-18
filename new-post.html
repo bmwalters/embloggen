@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>New Post • Embloggen</title>
+	<script async src="js/new-post.js"></script>
+	<link rel="stylesheet" href="css/style.css">
+	<style>
+		textarea {
+			width: calc(100% - 4px);
+		}
+	</style>
+</head>
+
+<body>
+	<main>
+		<header>
+			<h1>New Post</h1>
+		</header>
+		<hr>
+		<section>
+			<form id="new-post-form">
+				<input name="title" type="text" placeholder="Title" required autofocus>
+				<textarea name="synopsis" placeholder="Synopsis" required></textarea>
+				<textarea name="content" placeholder="Content" required></textarea>
+				<input type="submit" value="Submit">
+			</form>
+		</section>
+		<hr>
+		<footer>
+			<a href="/" id="home-link">Cancel</a>
+		</footer>
+	</main>
+</body>
+</html>

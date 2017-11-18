@@ -69,19 +69,21 @@
 			let data = new FormData(e.target)
 			let resultField = document.querySelector("#login-error")
 
-			return fetch(`/infrastructure/tokens/${data.get("username")}.b64`)
+			return fetch(`/infrastructure/users/${data.get("username")}.json`)
 			.then(function(response) {
 				if (!response.ok) { throw new Error(ErrorMessage.invalidUsername) }
 					return response
 			})
-			.then((res) => res.text())
+			.then((res) => res.json())
 			.then((contents) => {
-				return decryptAccessToken(contents, data.get("password"))
+				return Promise.all([Promise.resolve(contents), decryptAccessToken(contents.token, data.get("password"))])
 				.catch(() => { throw new Error(ErrorMessage.invalidPassword) })
 			})
-			.then((token) => {
-				localStorage.accessToken = token
+			.then(([contents, decryptedToken]) => {
+				localStorage.accessToken = decryptedToken
 				localStorage.authorName = data.get("username")
+				localStorage.commitName = contents.gitconfig.name
+				localStorage.commitEmail = contents.gitconfig.email
 				window.location.href = "/"
 			})
 			.catch((err) => {
