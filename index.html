@@ -1,13 +1,35 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
 	<meta charset="utf-8">
 	<title>Embloggen</title>
-	<script async src="app.js"></script>
+	<script async src="js/index.js"></script>
+	<link rel="stylesheet" href="css/style.css">
 </head>
+
 <body>
-	<input id="password" type="password" placeholder="Password...">
-	<button onclick="try_decrypt_token()">Submit</button>
-	<p id="result"></p>
+	<main>
+		<header>
+			<h1>Embloggen</h1>
+			<a href="new-post.html" id="new-post-link">📝</a>
+		</header>
+		<hr>
+		<section id="post-list"></section>
+		<hr>
+		<footer>
+			<a href="about.html" id="about-link">About</a>
+			<p id="logged-in-as">Logged in as <span id="logged-in-user" class="post-author"></span></p>
+			<a href="login.html" id="login-link">Log in</a>
+		</footer>
+	</main>
 </body>
+
+<template id="post-template">
+	<a class="post" href="#">
+		<p class="post-title"></p>
+		<p class="post-synopsis"></p>
+		<p class="post-by">Posted by <span class="post-author"></span></p>
+		<p class="post-date"></p>
+	</a>
+</template>
 </html>

@@ -59,7 +59,7 @@ const try_decrypt_token = function() {
 	let password = document.querySelector("#password").value
 	let resultField = document.querySelector("#result")
 
-	return fetch("tokens/bmwalters.b64")
+	return fetch("infrastructure/tokens/bmwalters.b64")
 		.then((res) => res.text())
 		.then((contents) => {
 			return decryptAccessToken(contents, password)
