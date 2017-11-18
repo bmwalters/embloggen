@@ -2,13 +2,60 @@
 <html lang="en">
 <head>
 	<meta charset="utf-8">
-	<title>Log in • Embloggen</title>
+	<title>Sign in • Embloggen</title>
 	<script async src="js/login.js"></script>
 	<link rel="stylesheet" href="css/style.css">
+	<style>
+		main {
+			min-width: 480px;
+			width: 10%;
+		}
+
+		#login-form input {
+			display: block;
+			width: calc(100% - 18px);
+		}
+
+		#login-form input + input {
+			margin-top: 8px;
+		}
+
+		#login-form input[type="submit"] {
+			display: block;
+			width: 50%;
+			margin-left: auto;
+			margin-right: auto;
+		}
+
+		#login-error {
+			color: red;
+			text-align: center;
+		}
+
+		#login-error:empty {
+			display: none;
+		}
+	</style>
 </head>
+
 <body>
-	<input id="password" type="password" placeholder="Password...">
-	<button onclick="try_decrypt_token()">Submit</button>
-	<p id="result"></p>
+	<main>
+		<header>
+			<h1>Sign in to Embloggen</h1>
+		</header>
+		<hr>
+		<section id="login-form-container">
+			<form id="login-form">
+				<input name="username" type="text" placeholder="Username" required autocomplete="username" autofocus>
+				<input name="password" type="password" placeholder="Password" required autocomplete="current-password">
+				<input type="submit" value="Sign in">
+				<p id="login-error"></p>
+			</form>
+		</section>
+		<hr>
+		<footer>
+			<a href="/" id="home-link">Cancel</a>
+		</footer>
+	</main>
 </body>
 </html>

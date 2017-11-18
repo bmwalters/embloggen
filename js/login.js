@@ -1,49 +1,35 @@
-const concatenateBufs = function(...bufs) {
-	let result = new Uint8Array(bufs.reduce((acc, el) => acc + el.byteLength, 0))
+(() => {
+	const ErrorMessage = {
+		invalidUsername: "ERROR_INVALID_USERNAME",
+		invalidPassword: "ERROR_INVALID_PASSWORD",
+	}
 
-	bufs.reduce((acc, el) => {
-		result.set(el, acc)
-		return acc + el.byteLength
-	}, 0)
+	const Base64 = {
+		decode: (str) => Uint8Array.from(atob(str), (c) => c.charCodeAt(0)),
+		encode: (buf) => btoa(String.fromCharCode.apply(null, buf))
+	}
 
-	return result
-}
+	const concatenateBuffers = function(...bufs) {
+		let result = new Uint8Array(bufs.reduce((acc, el) => acc + el.byteLength, 0))
 
-const b64_encode_buf = (buf) => btoa(String.fromCharCode.apply(null, buf))
+		bufs.reduce((acc, el) => {
+			result.set(el, acc)
+			return acc + el.byteLength
+		}, 0)
 
-const b64_decode_str = (str) => Uint8Array.from(atob(str), (c) => c.charCodeAt(0))
+		return result
+	}
 
-// Usage: encryptAccessToken("mytoken", "mypassword")
-const encryptAccessToken = function(token, password) {
-	const salt = window.crypto.getRandomValues(new Uint8Array(32))
-	const vector = window.crypto.getRandomValues(new Uint8Array(16))
-	let key
+	// Usage: decryptAccessToken("aldskjwlf", "mypassword")
+	const decryptAccessToken = function(token, password) {
+		const decoded = Base64.decode(token)
+		const salt = decoded.subarray(0, 32)
+		const vector = decoded.subarray(32, 48)
+		const encryptedToken = decoded.subarray(48)
 
-	const saltedPass = concatenateBufs(new TextEncoder("utf-8").encode(password), salt)
+		const saltedPass = concatenateBuffers(new TextEncoder("utf-8").encode(password), salt)
 
-	return window.crypto.subtle.digest({ name: "SHA-256" }, saltedPass)
-		.then((hash) => {
-			return window.crypto.subtle.importKey("raw", hash, { name: "AES-CBC" }, false, ["encrypt", "decrypt"])
-		})
-		.then((importedKey) => {
-			key = importedKey
-			return window.crypto.subtle.encrypt({ name: "AES-CBC", iv: vector }, key, new TextEncoder("utf-8").encode(token))
-		})
-		.then((encryptedToken) => {
-			return b64_encode_buf(concatenateBufs(salt, vector, new Uint8Array(encryptedToken)))
-		})
-}
-
-// Usage: decryptAccessToken("aldskjwlf", "mypassword")
-const decryptAccessToken = function(token, password) {
-	const decoded = b64_decode_str(token)
-	const salt = decoded.subarray(0, 32)
-	const vector = decoded.subarray(32, 48)
-	const encryptedToken = decoded.subarray(48)
-
-	const saltedPass = concatenateBufs(new TextEncoder("utf-8").encode(password), salt)
-
-	return window.crypto.subtle.digest({ name: "SHA-256" }, saltedPass)
+		return window.crypto.subtle.digest({ name: "SHA-256" }, saltedPass)
 		.then((hash) => {
 			return window.crypto.subtle.importKey("raw", hash, { name: "AES-CBC" }, false, ["encrypt", "decrypt"])
 		})
@@ -53,40 +39,66 @@ const decryptAccessToken = function(token, password) {
 		.then((decryptedToken) => {
 			return new TextDecoder("utf-8").decode(new Uint8Array(decryptedToken))
 		})
-}
+	}
 
-const try_decrypt_token = function() {
-	let password = document.querySelector("#password").value
-	let resultField = document.querySelector("#result")
+	// Usage: encryptAccessToken("mytoken", "mypassword")
+	const encryptAccessToken = function(token, password) {
+		const salt = window.crypto.getRandomValues(new Uint8Array(32))
+		const vector = window.crypto.getRandomValues(new Uint8Array(16))
+		let key
 
-	return fetch("infrastructure/tokens/bmwalters.b64")
-		.then((res) => res.text())
-		.then((contents) => {
-			return decryptAccessToken(contents, password)
-		})
-		.then((token) => {
-			resultField.style.color = "green"
-			resultField.innerText = token
-		})
-		.catch((err) => {
-			resultField.style.color = "red"
-			resultField.innerText = "bad password"
-		})
-}
+		const saltedPass = concatenateBuffers(new TextEncoder("utf-8").encode(password), salt)
 
-const gitHubClientId = "73cc67a71dcb0ed49a8e"
+		return window.crypto.subtle.digest({ name: "SHA-256" }, saltedPass)
+			.then((hash) => {
+				return window.crypto.subtle.importKey("raw", hash, { name: "AES-CBC" }, false, ["encrypt", "decrypt"])
+			})
+			.then((importedKey) => {
+				key = importedKey
+				return window.crypto.subtle.encrypt({ name: "AES-CBC", iv: vector }, key, new TextEncoder("utf-8").encode(token))
+			})
+			.then((encryptedToken) => {
+				return Base64.encode(concatenateBuffers(salt, vector, new Uint8Array(encryptedToken)))
+			})
+	}
 
-const fetchGitHubSecret = function(accessToken) {
-	let options = {
-		headers: new Headers({
-			Authorization: "Basic " + btoa("embloggenbot:" + accessToken)
+	let domLoaded = function() {
+		document.querySelector("#login-form").addEventListener("submit", (e) => {
+			e.preventDefault()
+
+			let data = new FormData(e.target)
+			let resultField = document.querySelector("#login-error")
+
+			return fetch(`/infrastructure/tokens/${data.get("username")}.b64`)
+			.then(function(response) {
+				if (!response.ok) { throw new Error(ErrorMessage.invalidUsername) }
+					return response
+			})
+			.then((res) => res.text())
+			.then((contents) => {
+				return decryptAccessToken(contents, data.get("password"))
+				.catch(() => { throw new Error(ErrorMessage.invalidPassword) })
+			})
+			.then((token) => {
+				localStorage.accessToken = token
+				localStorage.authorName = data.get("username")
+				window.location.href = "/"
+			})
+			.catch((err) => {
+				if (err.message == ErrorMessage.invalidUsername) {
+					resultField.innerText = "Username not registered."
+				} else if (err.message == ErrorMessage.invalidPassword) {
+					resultField.innerText = "Invalid password."
+				} else {
+					resultField.innerText = "Failed to log in. Please try again."
+				}
+			})
 		})
 	}
 
-	return fetch("https://api.github.com/user/emails", options)
-		.then((response) => response.json())
-		.then((data) => {
-			let addr = data.find((el) => el.email.includes("sec.ret")).email
-			return addr.substring(0, addr.indexOf("@"))
-		})
-}
+	if (document.readyState !== "loading") {
+		domLoaded()
+	} else {
+		document.addEventListener("DOMContentLoaded", domLoaded)
+	}
+})()
