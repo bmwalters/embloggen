@@ -1,4 +1,8 @@
 (() => {
+	const Base64 = {
+		encodeUnicode: (str) => btoa(String.fromCharCode.apply(null, new TextEncoder("utf-8").encode(str)))
+	}
+
 	const titleToIdentifier = (title) => title.replace(/[^\w]+/g, "-").slice(0, 20).toLowerCase()
 
 	const createPost = function(title, synopsis, content) {
@@ -29,7 +33,7 @@
 			const params = {
 				message: `Create "${title}"`,
 				author: authorInfo,
-				content: btoa(content)
+				content: Base64.encodeUnicode(content)
 			}
 
 			const options = { headers: headers, body: JSON.stringify(params), method: "PUT" }
