@@ -1,0 +1,17 @@
+embloggen • /ɛmˈblɑɡən/ • verb
+"A perfectly cromulent word; to turn into a blog."
+Example: I have _embloggened_ this GitHub repo.
+
+---
+
+This site is a blog. I don't currently keep a blog, and I don't plan to keep one in the short term. You may ask, "Why, then, would you write blog software?" My answer to that would be a ¯\_(ツ)_/¯ and an explanation of why this blog in particular is cool anyway.
+
+GitHub hosts this blog. You may have assumed this based on the contents of the address bar, but this site is being served to you via GitHub's Pages service which publishes static content hosted in your git repos to the Internet. A key facet of this hosting is the word "static". GitHub will happily present content that doesn't change, but if you'd like to interact with your content (such as writing blog posts), you can't do it using a site hosted with GitHub pages... or can you?
+
+GitHub, being a tool by and large used by developers, exposes an extensive API. The API allows you to modify user data, repository data, issues, pull requests, and other areas typically managed through the site. A few months back I got an idea—what if I used the GitHub API to create an interactive web application operated solely through GitHub pages? Data could be read from the repository and written to it through API calls authenticated through the user's account. I figured a blog would be a simple yet illustrative project to test this idea on.
+
+Here we are! This blog is that concept more or less implemented. On the home page, you can see a list of all the blog posts currently living inside the repo, and logged in users are able to author new posts through a separate page. After saving the new post, giving GitHub pages a few seconds to deploy the new site, and clearing the browser cache, a newly written post will appear at the top of the front page. This is all accomplished using modern JavaScript, the GitHub API, crypto, and some special repo configuration.
+
+A simple explanation is that all data is read through fetching files publicly exposed in the repository, and that data is written by authenticating using a dedicated bot account. For each user of the site, there exists a personal access token associated with the bot account (which functions similarly to a password, but allows limited access to data and is easily revocable). When a user logs in, an encrypted copy of the token is decrypted using a key derived from their password hash and stored for later use in API requests. I would've liked to allow users to authenticate with their own account, but GitHub doesn't currently allow restricting repository access to a single repo, and I'd like to minimize the risk in case the publicly available tokens are brute-force decrypted. Newly created posts are still associated with the user who posted them in GitHub commits (as the API allows setting the email address of the commit author), so the only inconvenience is having separate credentials for this site.
+
+All in all, I'd say that I have proven the possibility of creating a GitHub-pages-hosted interactive web application using the GitHub API. Though today I've finished the first working version of Embloggen, there are several steps I can take to improve the site and create a slicker experience for people wanting to try it out for themselves. Look out for new enhancements over the coming weeks!
